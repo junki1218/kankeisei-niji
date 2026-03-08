@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relationship Rainbow - 人との距離感を学ぶアプリ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- PWA Settings -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    <link rel="apple-touch-icon" href="./あいさつ.png">
+    <!-- スクリーンショットのための html2canvas のCDN -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body class="mode-hiragana"> <!-- デフォルトはひらがなモード -->
+    <div id="app">
+
+        <!-- OP画面 (スタート画面) -->
+        <section id="op-screen" class="screen active">
+            <div class="glass-panel op-panel">
+                <h1 class="main-title">Relationship Rainbow</h1>
+                <p class="subtitle hiragana text-xl">ひととの きょりかん を まなぼう</p>
+                <p class="subtitle kanji text-xl">人との距離感を学ぼう</p>
+                <button id="op-start-btn" class="primary-btn pulse-animation mt-8">
+                    <span class="hiragana">スタート ▸</span>
+                    <span class="kanji">スタート ▸</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 設定画面 -->
+        <section id="settings-screen" class="screen">
+            <div class="glass-panel">
+                <h2 class="hiragana section-title">せってい</h2>
+                <h2 class="kanji section-title">設定（せってい）</h2>
+
+                <div class="mode-toggle mb-6">
+                    <label class="radio-label">
+                        <input type="radio" name="text-mode" value="hiragana" checked>
+                        <span class="hiragana">ひらがなモード</span>
+                        <span class="kanji">ひらがなモード</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="text-mode" value="kanji">
+                        <span class="hiragana">かんじモード</span>
+                        <span class="kanji">漢字モード</span>
+                    </label>
+                </div>
+
+                <div class="upload-area mb-6">
+                    <p class="description hiragana">しゃしんをえらんで、どのグループかきめよう！</p>
+                    <p class="description kanji">写真を選んで、どのグループか決めよう！</p>
+
+                    <input type="file" id="image-upload" accept="image/*" multiple>
+                    <label for="image-upload" class="upload-btn outline-btn">
+                        <span class="hiragana">📷 しゃしんをえらぶ（1〜10まい）</span>
+                        <span class="kanji">📷 写真を選ぶ（1〜10枚）</span>
+                    </label>
+                </div>
+
+                <div id="image-list" class="image-list">
+                    <!-- ここにアップロードされた画像とセレクトボックスが追加されます -->
+                </div>
+
+                <div class="actions flex-space-between mt-8">
+                    <button id="reset-btn" class="text-btn danger-text">
+                        <span class="hiragana">すべてけす</span>
+                        <span class="kanji">すべて消す</span>
+                    </button>
+                    <button id="start-btn" class="primary-btn" disabled>
+                        <span class="hiragana">はじめる ▸</span>
+                        <span class="kanji">はじめる ▸</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- メイン画面（ゲーム画面） -->
+        <section id="game-screen" class="screen">
+            <!-- テキスト（だれのしゃしんかな～）は削除とスタイリッシュ化により非表示 -->
+            <div id="game-wrapper" class="glass-panel no-padding">
+                <div id="game-container" class="game-container">
+                    <!-- 背景画像の上に重なる判定エリア -->
+                    <div class="drop-zone purple" data-color="purple"></div>
+                    <div class="drop-zone blue" data-color="blue"></div>
+                    <div class="drop-zone green" data-color="green"></div>
+                    <div class="drop-zone yellow" data-color="yellow"></div>
+                    <div class="drop-zone orange" data-color="orange"></div>
+                    <div class="drop-zone red" data-color="red"></div>
+
+                    <!-- 大きく表示されるカードのオーバーレイ -->
+                    <div id="card-intro-overlay" class="hidden">
+                        <img id="intro-card-img" src="" alt="Intro Card">
+                        <div id="intro-card-name" class="intro-name-tag hidden"></div>
+                    </div>
+
+                    <!-- 現在プレイ中のカードが表示されるエリア -->
+                    <div id="play-area"></div>
+
+                    <!-- 正解・不正解のフィードバック -->
+                    <div id="feedback-overlay" class="hidden"></div>
+                </div>
+            </div>
+
+            <div id="game-controls" class="mt-6 flex-center">
+                <button id="next-btn" class="hidden primary-btn pulse-animation">
+                    <span class="hiragana">つぎへ ▸</span>
+                    <span class="kanji">次へ ▸</span>
+                </button>
+            </div>
+
+            <div id="clear-message" class="hidden glass-panel mt-6">
+                <h2 class="hiragana text-xxl highlight mb-6">おわり！</h2>
+                <h2 class="kanji text-xxl highlight mb-6">終わり！</h2>
+                <div class="flex-center gap-4">
+                    <button id="screenshot-btn" class="outline-btn">
+                        <span class="hiragana">📷 きねんさつえい</span>
+                        <span class="kanji">📷 記念撮影</span>
+                    </button>
+                    <button id="to-quiz-btn" class="primary-btn bounce-animation">
+                        <span class="hiragana">ふれあいクイズへ ▸</span>
+                        <span class="kanji">ふれあいクイズへ ▸</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ふれあいクイズ（タッチクイズ）画面 -->
+        <section id="quiz-screen" class="screen">
+            <div class="glass-panel">
+                <h2 class="hiragana section-title mb-6">どこまで ふれあって いいかな？</h2>
+                <h2 class="kanji section-title mb-6">どこまで触れ合っていいかな？</h2>
+
+                <div class="quiz-container">
+                    <div class="quiz-target mb-6">
+                        <img id="quiz-person-img" src="" alt="Person" class="quiz-card">
+                        <div class="quiz-plus">+</div>
+                        <div id="quiz-action-icon" class="quiz-action">🤝</div>
+                    </div>
+
+                    <p id="quiz-action-name" class="text-xl mb-8 font-bold text-gray-700"></p>
+
+                    <div class="quiz-buttons">
+                        <button id="quiz-go-btn" class="quiz-btn go-btn">
+                            <span class="icon">😊</span>
+                            <span class="label">GO</span>
+                        </button>
+                        <button id="quiz-no-btn" class="quiz-btn no-btn">
+                            <span class="icon">🙅‍♂️</span>
+                            <span class="label">NO</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-clear-message" class="hidden glass-panel mt-6">
+                <h2 class="hiragana text-xxl highlight mb-6">すべて おわり！ 素晴らしい！</h2>
+                <h2 class="kanji text-xxl highlight mb-6">すべて終わり！素晴らしい！</h2>
+                <button id="return-op-btn" class="outline-btn">
+                    <span class="hiragana">さいしょにもどる</span>
+                    <span class="kanji">最初に戻る</span>
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- BGM -->
+    <audio id="bgm-op" loop src="./Echoes_of_Twin_Dreams.mp3"></audio>
+    <audio id="bgm-game" loop src="./Chroma_Cascade.mp3"></audio>
+
+    <script src="script.js"></script>
+    <script>
+        // Service Worker の登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, (err) => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>

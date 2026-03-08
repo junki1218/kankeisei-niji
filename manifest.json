@@ -1,0 +1,17 @@
+{
+  "name": "Relationship Rainbow (かんけいせいの虹)",
+  "short_name": "虹アプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f8fd",
+  "theme_color": "#8b5cf6",
+  "description": "CAP サークルプログラム支援ツール - 人との距離感を学ぶアプリ",
+  "icons": [
+    {
+      "src": "./あいさつ.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
