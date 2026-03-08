@@ -455,7 +455,7 @@ input[type="file"] {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('./あいさつ.png');
+    background-image: url('./board.png');
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

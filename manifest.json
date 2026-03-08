@@ -8,7 +8,7 @@
   "description": "CAP サークルプログラム支援ツール - 人との距離感を学ぶアプリ",
   "icons": [
     {
-      "src": "./あいさつ.png",
+      "src": "./board.png",
       "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"
