@@ -101,18 +101,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // クイズのアクション定義
     const touchActions = [
         { id: 'greet', icon: '👋', hiragana: 'あいさつ', kanji: '挨拶（あいさつ）' },
-        { id: 'talk', icon: '🗣️', hiragana: 'はなす', kanji: '話す' },
-        { id: 'hand', icon: '🤝', hiragana: 'てをつなぐ', kanji: '手をつなぐ' },
-        { id: 'hug', icon: '🫂', hiragana: 'ハグする', kanji: 'ハグする' }
+        { id: 'talk', icon: '🗣️', hiragana: 'かいわ', kanji: '会話' },
+        { id: 'highfive', icon: '🙌', hiragana: 'ハイタッチ', kanji: 'ハイタッチ' },
+        { id: 'handshake', icon: '🤝', hiragana: 'あくしゅ', kanji: '握手' },
+        { id: 'hug', icon: '🫂', hiragana: 'ハグ', kanji: 'ハグ' },
+        { id: 'private', icon: '🫣', hiragana: 'プライベートゾーンにふれる・みる', kanji: 'プライベートゾーンに触れる/見る' }
     ];
 
     // クイズ正解判定ロジック (true = GO正解, false = NO正解)
     // CAPプログラムベースの距離感
     const quizRules = {
-        'greet': { 'purple': true, 'blue': true, 'green': true, 'yellow': true, 'orange': true, 'red': false },
-        'talk': { 'purple': true, 'blue': true, 'green': true, 'yellow': true, 'orange': false, 'red': false },
-        'hand': { 'purple': true, 'blue': true, 'green': true, 'yellow': false, 'orange': false, 'red': false },
-        'hug': { 'purple': true, 'blue': true, 'green': false, 'yellow': false, 'orange': false, 'red': false }
+        'greet': { 'purple': true, 'blue': true, 'green': true, 'yellow': true, 'orange': true, 'red': true },
+        'talk': { 'purple': true, 'blue': true, 'green': true, 'yellow': true, 'orange': true, 'red': false },
+        'highfive': { 'purple': true, 'blue': true, 'green': true, 'yellow': true, 'orange': false, 'red': false },
+        'handshake': { 'purple': true, 'blue': true, 'green': true, 'yellow': false, 'orange': false, 'red': false },
+        'hug': { 'purple': true, 'blue': true, 'green': false, 'yellow': false, 'orange': false, 'red': false },
+        'private': { 'purple': true, 'blue': false, 'green': false, 'yellow': false, 'orange': false, 'red': false }
     };
 
     function init() {
@@ -538,11 +542,13 @@ document.addEventListener('DOMContentLoaded', () => {
         draggedElement.removeEventListener('touchstart', dragStart);
         draggedElement.classList.add('fixed');
 
-        // ％に変換してリサイズ対応
+        // ％に変換してリサイズ対応（translateを使わずに左上基準にする）
         const rect = draggedElement.getBoundingClientRect();
         const containerRect = gameContainer.getBoundingClientRect();
-        const leftPerc = ((rect.left - containerRect.left + rect.width / 2) / containerRect.width) * 100;
-        const topPerc = ((rect.top - containerRect.top + rect.height / 2) / containerRect.height) * 100;
+
+        // 中心ではなく左上を基準に記録する
+        const leftPerc = ((rect.left - containerRect.left) / containerRect.width) * 100;
+        const topPerc = ((rect.top - containerRect.top) / containerRect.height) * 100;
 
         draggedElement.style.left = `${leftPerc}%`;
         draggedElement.style.top = `${topPerc}%`;
@@ -584,30 +590,48 @@ document.addEventListener('DOMContentLoaded', () => {
     function takeScreenshot() {
         screenshotBtn.style.visibility = 'hidden';
         toQuizBtn.style.visibility = 'hidden';
-        html2canvas(document.getElementById('game-wrapper')).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'rainbow_result.png';
-            link.href = canvas.toDataURL('image/png'); link.click();
-            screenshotBtn.style.visibility = 'visible';
-            toQuizBtn.style.visibility = 'visible';
-        });
+        window.scrollTo(0, 0); // スクロール位置のズレ防止
+
+        setTimeout(() => {
+            html2canvas(document.getElementById('game-wrapper'), {
+                scale: window.devicePixelRatio || 2,
+                scrollX: 0,
+                scrollY: 0,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'rainbow_result.png';
+                link.href = canvas.toDataURL('image/png'); link.click();
+                screenshotBtn.style.visibility = 'visible';
+                toQuizBtn.style.visibility = 'visible';
+            });
+        }, 100);
     }
 
     // --- ふれあいクイズ（タッチクイズ）ロジック ---
     function startQuiz() {
         switchScreen(quizScreen);
 
-        // 問題リストを生成（アップロード画像 × 基本アクション全て）
+        // 問題リストを生成
         quizQueue = [];
         uploadedImages.forEach(imgData => {
-            // ランダムに2種のアクションを選ぶなど工夫可能だが、今回はすべて作成してシャッフル
-            touchActions.forEach(action => {
+            if (imgData.targetColor === 'purple') {
+                // 自分（紫）の場合は F (private) だけを出題する
+                const action = touchActions.find(a => a.id === 'private');
                 quizQueue.push({
                     imgData: imgData,
                     action: action,
                     isAllowed: quizRules[action.id][imgData.targetColor]
                 });
-            });
+            } else {
+                touchActions.forEach(action => {
+                    quizQueue.push({
+                        imgData: imgData,
+                        action: action,
+                        isAllowed: quizRules[action.id][imgData.targetColor]
+                    });
+                });
+            }
         });
 
         // 配列をシャッフル
