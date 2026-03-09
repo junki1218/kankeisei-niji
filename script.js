@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackOverlay = document.getElementById('feedback-overlay');
     const nextBtn = document.getElementById('next-btn');
     const clearMessage = document.getElementById('clear-message');
-    const screenshotBtn = document.getElementById('screenshot-btn');
     const toQuizBtn = document.getElementById('to-quiz-btn');
 
     // クイズ部品
@@ -139,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBtn.addEventListener('click', resetData);
         startBtn.addEventListener('click', startGame);
         nextBtn.addEventListener('click', nextTurn);
-        screenshotBtn.addEventListener('click', takeScreenshot);
         toQuizBtn.addEventListener('click', startQuiz);
         quizGoBtn.addEventListener('click', () => handleQuizAnswer(true));
         quizNoBtn.addEventListener('click', () => handleQuizAnswer(false));
@@ -587,27 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.classList.add('hidden'); currentCardIndex++; showCardIntro();
     }
 
-    function takeScreenshot() {
-        screenshotBtn.style.visibility = 'hidden';
-        toQuizBtn.style.visibility = 'hidden';
-        window.scrollTo(0, 0); // スクロール位置のズレ防止
-
-        setTimeout(() => {
-            html2canvas(document.getElementById('game-wrapper'), {
-                scale: window.devicePixelRatio || 2,
-                scrollX: 0,
-                scrollY: 0,
-                useCORS: true
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'rainbow_result.png';
-                link.href = canvas.toDataURL('image/png'); link.click();
-                screenshotBtn.style.visibility = 'visible';
-                toQuizBtn.style.visibility = 'visible';
-            });
-        }, 100);
-    }
-
     // --- ふれあいクイズ（タッチクイズ）ロジック ---
     function startQuiz() {
         switchScreen(quizScreen);
@@ -625,6 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 touchActions.forEach(action => {
+                    // 自分（紫）以外はすべてのアクションを出題する（Fも出題されるが正解はNO）
                     quizQueue.push({
                         imgData: imgData,
                         action: action,
