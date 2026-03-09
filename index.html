@@ -12,8 +12,6 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <link rel="apple-touch-icon" href="./board.png">
-    <!-- スクリーンショットのための html2canvas のCDN -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 
 <body class="mode-hiragana"> <!-- デフォルトはひらがなモード -->
@@ -113,17 +111,20 @@
                 </button>
             </div>
 
-            <div id="clear-message" class="hidden glass-panel mt-6">
-                <h2 class="hiragana text-xxl highlight mb-6">おわり！</h2>
-                <h2 class="kanji text-xxl highlight mb-6">終わり！</h2>
+            <div id="clear-message" class="hidden glass-panel"
+                style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); z-index: 500;">
+                <h2 class="text-xl font-bold highlight">
+                    <span class="hiragana">かんせい！</span>
+                    <span class="kanji">完成！</span>
+                </h2>
+                <p class="mt-6 mb-8 text-gray-700">
+                    <span class="hiragana">🌈 にじが できたね！<br><br>※このがめんを きねんさつえい（スクリーンショット）しよう！<br>↓つすぎは クイズにちょうせん！</span>
+                    <span class="kanji">🌈 虹が できました！<br><br>※この画面を携帯の機能で記念撮影（スクリーンショット）してね。<br>↓次はふれあいクイズに挑戦！</span>
+                </p>
                 <div class="flex-center gap-4">
-                    <button id="screenshot-btn" class="outline-btn">
-                        <span class="hiragana">📷 きねんさつえい</span>
-                        <span class="kanji">📷 記念撮影</span>
-                    </button>
-                    <button id="to-quiz-btn" class="primary-btn bounce-animation">
-                        <span class="hiragana">ふれあいクイズへ ▸</span>
-                        <span class="kanji">ふれあいクイズへ ▸</span>
+                    <button class="primary-btn pulse-animation" id="to-quiz-btn">
+                        <span class="hiragana">クイズスタート！</span>
+                        <span class="kanji">クイズスタート！</span>
                     </button>
                 </div>
             </div>
