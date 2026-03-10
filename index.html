@@ -55,13 +55,20 @@
 
                     <input type="file" id="image-upload" accept="image/*" multiple>
                     <label for="image-upload" class="upload-btn outline-btn">
-                        <span class="hiragana">📷 しゃしんをえらぶ（1〜10まい）</span>
-                        <span class="kanji">📷 写真を選ぶ（1〜10枚）</span>
+                        <span class="hiragana">📷 いっ気にえらぶ（1〜10まい）</span>
+                        <span class="kanji">📷 一気に選ぶ（1〜10枚）</span>
                     </label>
                 </div>
 
-                <div id="image-list" class="image-list">
+                <div id="image-list" class="image-list mb-6">
                     <!-- ここにアップロードされた画像とセレクトボックスが追加されます -->
+                </div>
+
+                <div class="add-item-container flex-center mb-6">
+                    <button id="add-item-btn" class="outline-btn">
+                        <span class="hiragana">＋ コマをついかする</span>
+                        <span class="kanji">＋ コマを追加する</span>
+                    </button>
                 </div>
 
                 <div class="actions flex-space-between mt-8">
@@ -112,14 +119,14 @@
             </div>
 
             <div id="clear-message" class="hidden glass-panel"
-                style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); z-index: 500;">
+                style="position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%); z-index: 500; width: 90%; max-width: 400px;">
                 <h2 class="text-xl font-bold highlight">
                     <span class="hiragana">かんせい！</span>
                     <span class="kanji">完成！</span>
                 </h2>
-                <p class="mt-6 mb-8 text-gray-700">
-                    <span class="hiragana">🌈 にじが できたね！<br><br>※このがめんを きねんさつえい（スクリーンショット）しよう！<br>↓つすぎは クイズにちょうせん！</span>
-                    <span class="kanji">🌈 虹が できました！<br><br>※この画面を携帯の機能で記念撮影（スクリーンショット）してね。<br>↓次はふれあいクイズに挑戦！</span>
+                <p class="mt-4 mb-6 text-gray-700">
+                    <span class="hiragana">🌈 にじが できたね！<br><br>※このがめんを スクリーンショットしてね<br>↓つぎは クイズにちょうせん！</span>
+                    <span class="kanji">🌈 虹が できました！<br><br>※この画面をスクリーンショットしてね。<br>↓次はふれあいクイズに挑戦！</span>
                 </p>
                 <div class="flex-center gap-4">
                     <button class="primary-btn pulse-animation" id="to-quiz-btn">

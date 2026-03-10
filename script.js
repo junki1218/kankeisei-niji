@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.getElementById('next-btn');
     const clearMessage = document.getElementById('clear-message');
     const toQuizBtn = document.getElementById('to-quiz-btn');
+    const addItemBtn = document.getElementById('add-item-btn');
 
     // クイズ部品
     const quizPersonImg = document.getElementById('quiz-person-img');
@@ -139,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.addEventListener('click', startGame);
         nextBtn.addEventListener('click', nextTurn);
         toQuizBtn.addEventListener('click', startQuiz);
+        addItemBtn.addEventListener('click', handleAddItem);
         quizGoBtn.addEventListener('click', () => handleQuizAnswer(true));
         quizNoBtn.addEventListener('click', () => handleQuizAnswer(false));
         returnOpBtn.addEventListener('click', () => location.reload()); // 初期状態に安全に戻す
@@ -219,8 +221,40 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.className = 'image-item';
 
+            // 削除ボタン
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-item-btn';
+            deleteBtn.innerHTML = '×';
+            deleteBtn.title = textMode === 'hiragana' ? 'けす' : '消す';
+            deleteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                uploadedImages.splice(index, 1);
+                saveToLocalStorage();
+                updateUI();
+            });
+
+            // 個別画像変更用のinput
+            const singleFileInput = document.createElement('input');
+            singleFileInput.type = 'file';
+            singleFileInput.accept = 'image/*';
+            singleFileInput.style.display = 'none';
+            singleFileInput.addEventListener('change', async (e) => {
+                if (e.target.files.length > 0) {
+                    try {
+                        const newUrl = await resizeImage(e.target.files[0]);
+                        uploadedImages[index].dataUrl = newUrl;
+                        saveToLocalStorage();
+                        updateUI();
+                    } catch (err) { console.error('Image Error:', err); }
+                }
+            });
+
             const img = document.createElement('img');
             img.src = imgData.dataUrl;
+            img.title = textMode === 'hiragana' ? 'タップしてしゃしんをかえる' : 'タップして写真を変更';
+            img.addEventListener('click', () => {
+                singleFileInput.click();
+            });
 
             const select = document.createElement('select');
             attributes.forEach(attr => {
@@ -240,17 +274,34 @@ document.addEventListener('DOMContentLoaded', () => {
             nameInput.type = 'text';
             nameInput.placeholder = textMode === 'hiragana' ? 'なまえ（じゆう）' : '名前（自由）';
             nameInput.value = imgData.name || '';
-            nameInput.maxLength = 10; // slightly more than 6 to allow typing, limit display later
+            nameInput.maxLength = 10;
             nameInput.addEventListener('change', (e) => {
                 uploadedImages[index].name = e.target.value;
                 saveToLocalStorage();
             });
 
+            item.appendChild(deleteBtn);
+            item.appendChild(singleFileInput);
             item.appendChild(img);
             item.appendChild(nameInput);
             item.appendChild(select);
             imageList.appendChild(item);
         });
+    }
+
+    function handleAddItem() {
+        if (uploadedImages.length >= 20) {
+            alert(textMode === 'hiragana' ? 'これいじょう つイカできません' : 'これ以上追加できません');
+            return;
+        }
+        uploadedImages.push({
+            id: 'img_' + Date.now() + Math.random().toString(36).substr(2, 5),
+            dataUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 透明プレースホルダー
+            targetColor: 'purple',
+            name: ''
+        });
+        saveToLocalStorage();
+        updateUI();
     }
 
     function updateUI() {
@@ -261,7 +312,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveToLocalStorage() { localStorage.setItem('sd_images_v2', JSON.stringify(uploadedImages)); }
     function loadFromLocalStorage() {
         const data = localStorage.getItem('sd_images_v2');
-        if (data) uploadedImages = JSON.parse(data);
+        if (data) {
+            uploadedImages = JSON.parse(data);
+        }
+
+        // もし空ならデフォルトの6枠を用意する
+        if (uploadedImages.length === 0) {
+            const defaultColors = ['purple', 'blue', 'green', 'yellow', 'orange', 'red'];
+            const transparentImg = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+            uploadedImages = defaultColors.map(color => ({
+                id: 'img_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                dataUrl: transparentImg,
+                targetColor: color,
+                name: ''
+            }));
+            saveToLocalStorage();
+        }
     }
     function resetData() {
         if (confirm(textMode === 'hiragana' ? 'けしますか？' : 'リセットしますか？')) {
