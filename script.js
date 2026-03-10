@@ -350,7 +350,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showCardIntro() {
         if (currentCardIndex >= uploadedImages.length) {
-            clearMessage.classList.remove('hidden'); return;
+            // Service Workerのキャッシュ等で古いindex.htmlが残っている場合への対処として、JSから強制的に上書きする
+            clearMessage.style.position = 'absolute';
+            clearMessage.style.top = 'auto'; // topの指定を解除
+            clearMessage.style.bottom = '5%';
+            clearMessage.style.left = '50%';
+            clearMessage.style.transform = 'translateX(-50%)';
+            clearMessage.style.width = '90%';
+            clearMessage.style.maxWidth = '400px';
+
+            const pTag = clearMessage.querySelector('p');
+            if (pTag) {
+                pTag.innerHTML = `
+                    <span class="hiragana">🌈 にじが できたね！<br><br>※このがめんを スクリーンショットしてね<br>↓つぎは クイズにちょうせん！</span>
+                    <span class="kanji">🌈 虹が できました！<br><br>※この画面をスクリーンショットしてね。<br>↓次はふれあいクイズに挑戦！</span>
+                `;
+            }
+
+            clearMessage.classList.remove('hidden');
+            return;
         }
         const data = uploadedImages[currentCardIndex];
         introCardImg.src = data.dataUrl;
