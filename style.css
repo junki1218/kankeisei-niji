@@ -660,10 +660,8 @@ input[type="file"] {
 /* 固定後 */
 .draggable-card-container.fixed {
     cursor: pointer;
-    /* タップで拡大可能に */
-    transform: scale(0.9) !important;
-    transform-origin: top left;
-    /* 左上基準にすることで位置ズレを防ぐ */
+    /* タップで縮小等する場合に備えておくが、transformはJSで消さずに維持する想定ならここでは指定しない */
+    /* JS側で scale(0.9) 等を当てないよう修正済のためシンプルに */
 }
 
 .draggable-card-container.fixed .draggable-card {
@@ -674,14 +672,13 @@ input[type="file"] {
 /* タップ拡大時のスタイル */
 .draggable-card-container.enlarged {
     z-index: 11000;
-    transform: scale(2.0) !important;
-    transform-origin: top left;
+    transform: translate(-50%, -50%) scale(2.0) !important;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (max-width: 600px) {
     .draggable-card-container.enlarged {
-        transform: scale(1.5) !important;
+        transform: translate(-50%, -50%) scale(1.5) !important;
     }
 }
 

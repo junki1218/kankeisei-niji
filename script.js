@@ -350,14 +350,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showCardIntro() {
         if (currentCardIndex >= uploadedImages.length) {
-            // Service Workerのキャッシュ等で古いindex.htmlが残っている場合への対処として、JSから強制的に上書きする
-            clearMessage.style.position = 'absolute';
-            clearMessage.style.top = 'auto'; // topの指定を解除
-            clearMessage.style.bottom = '5%';
-            clearMessage.style.left = '50%';
-            clearMessage.style.transform = 'translateX(-50%)';
-            clearMessage.style.width = '90%';
-            clearMessage.style.maxWidth = '400px';
+            // Service Workerのキャッシュ等で古いindex.htmlやCSSが残っている場合へ対処するため
+            // headタグに直接styleタグを注入して強制的に上書きします。
+            const style = document.createElement('style');
+            style.textContent = `
+                #clear-message {
+                    position: absolute !important;
+                    bottom: 5% !important;
+                    top: auto !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    width: 90% !important;
+                    max-width: 400px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
             const pTag = clearMessage.querySelector('p');
             if (pTag) {
@@ -624,17 +631,28 @@ document.addEventListener('DOMContentLoaded', () => {
         draggedElement.removeEventListener('touchstart', dragStart);
         draggedElement.classList.add('fixed');
 
-        // ％に変換してリサイズ対応（translateを使わずに左上基準にする）
         const rect = draggedElement.getBoundingClientRect();
         const containerRect = gameContainer.getBoundingClientRect();
 
-        // 中心ではなく左上を基準に記録する
-        const leftPerc = ((rect.left - containerRect.left) / containerRect.width) * 100;
-        const topPerc = ((rect.top - containerRect.top) / containerRect.height) * 100;
+        // fixedクラスが付与されるとCSSで scale(0.9) 等が適用されるため、
+        // 視覚的な中心座標を維持するために、現在の中心座標を計算します。
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
 
+        // コンテナ内での中心座標の割合(%)を計算します。
+        const leftPerc = ((centerX - containerRect.left) / containerRect.width) * 100;
+        const topPerc = ((centerY - containerRect.top) / containerRect.height) * 100;
+
+        // left/top は要素の左上の位置を指定しますが、
+        // .draggable-card-container にはCSSで transform: translate(-50%, -50%) が
+        // かかっている（またはドラッグ中と同等の中心起点の動きをする）ため、
+        // そのまま中心の割合を left/top に入れることで位置が維持されます。
         draggedElement.style.left = `${leftPerc}%`;
         draggedElement.style.top = `${topPerc}%`;
-        draggedElement.style.transform = ''; // CSSに任せる
+
+        // CSS側の transform: translate(-50%, -50%)（及び固定時の scale）を効かせるため、
+        // JSで直接割り当てていた transform（もしあれば）をクリアします。
+        draggedElement.style.transform = '';
 
         // Z-indexを固定して新しく来るカードより下にするが、既存のカードとの前後関係は維持
         draggedElement.dataset.originalZIndex = draggedElement.style.zIndex;
