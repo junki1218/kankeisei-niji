@@ -12,6 +12,24 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <link rel="apple-touch-icon" href="./board.png">
+    <style>
+        #op-screen.active {
+            display: flex !important;
+        }
+
+        #op-screen:not(.active) {
+            display: none !important;
+        }
+
+        .screen:not(.active) {
+            display: none !important;
+        }
+
+        #video-container {
+            pointer-events: none;
+            /* クリックを阻害しないための念押し */
+        }
+    </style>
 </head>
 
 <body class="mode-hiragana"> <!-- デフォルトはひらがなモード -->

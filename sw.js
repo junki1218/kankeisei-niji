@@ -1,16 +1,20 @@
-const CACHE_NAME = 'rainbow-app-v10';
+const CACHE_NAME = 'rainbow-app-v16';
 const urlsToCache = [
     './',
     './index.html',
     './style.css',
     './script.js',
     './board.png',
+    './hint board.png',
+    './OP.mp4',
     './Echoes_of_Twin_Dreams.mp3',
     './Chroma_Cascade.mp3'
 ];
 
 // インストール時にキャッシュ
 self.addEventListener('install', (event) => {
+    // 新しいバージョンを即座にアクティブにする
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -53,6 +57,9 @@ self.addEventListener('fetch', (event) => {
 
 // 古いキャッシュの削除
 self.addEventListener('activate', (event) => {
+    // アクティベート後、すぐにすべてのクライアントを制御下におく
+    event.waitUntil(self.clients.claim());
+
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then((cacheNames) => {
