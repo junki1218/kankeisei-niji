@@ -60,10 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsScreen = document.getElementById('settings-screen');
     const gameScreen = document.getElementById('game-screen');
     const quizScreen = document.getElementById('quiz-screen');
+    const opVideo = document.getElementById('op-video');
 
     // UI部品
     const modeRadios = document.querySelectorAll('input[name="text-mode"]');
-    const imageUpload = document.getElementById('image-upload');
     const imageList = document.getElementById('image-list');
     const opStartBtn = document.getElementById('op-start-btn');
     const startBtn = document.getElementById('start-btn');
@@ -135,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        imageUpload.addEventListener('change', handleImageUpload);
         resetBtn.addEventListener('click', resetData);
         startBtn.addEventListener('click', startGame);
         nextBtn.addEventListener('click', nextTurn);
@@ -147,7 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchScreen(targetScreen) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.screen').forEach(s => {
+            s.classList.remove('active');
+            s.style.display = ''; // インラインスタイルをリセットしてCSSの表示非表示を正しく効かせる
+        });
+
+        // OP画面以外に行くときはビデオを止める
+        if (opVideo) {
+            if (targetScreen === opScreen) {
+                opVideo.play().catch(() => { });
+            } else {
+                opVideo.pause();
+            }
+        }
+
         targetScreen.classList.add('active');
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
@@ -189,31 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function handleImageUpload(e) {
-        const files = Array.from(e.target.files);
-        if (!files.length) return;
-        const toProcess = files.slice(0, 10 - uploadedImages.length);
 
-        const uploadTextOrig = document.querySelector('.upload-btn .hiragana').textContent;
-        document.querySelector('.upload-btn').style.opacity = '0.5';
-
-        for (const file of toProcess) {
-            try {
-                const dataUrl = await resizeImage(file);
-                uploadedImages.push({
-                    id: 'img_' + Date.now() + Math.random().toString(36).substr(2, 5),
-                    dataUrl: dataUrl,
-                    targetColor: 'purple',
-                    name: ''
-                });
-            } catch (err) { console.error('Image Error:', err); }
-        }
-
-        document.querySelector('.upload-btn').style.opacity = '1';
-        saveToLocalStorage();
-        updateUI();
-        imageUpload.value = '';
-    }
 
     function renderImageList() {
         imageList.innerHTML = '';
@@ -339,12 +327,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         if (uploadedImages.length === 0) return;
 
+        // ヒントありかなしの判定
+        const hintMode = document.querySelector('input[name="hint-mode"]:checked')?.value || 'with_hint';
+        if (hintMode === 'with_hint') {
+            gameContainer.style.backgroundImage = 'url("./hint board.png")';
+        } else {
+            gameContainer.style.backgroundImage = 'url("./board.png")';
+        }
+
         // Randomize
         uploadedImages.sort(() => Math.random() - 0.5);
 
         switchScreen(gameScreen);
         currentCardIndex = 0;
         playArea.innerHTML = ''; clearMessage.classList.add('hidden'); nextBtn.classList.add('hidden');
+
+        // トップコントロールがあれば隠す
+        const topControls = document.getElementById('game-top-controls');
+        if (topControls) topControls.classList.add('hidden');
+
         showCardIntro();
     }
 
@@ -390,6 +391,43 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dynamic-to-quiz-btn').addEventListener('click', startQuiz);
 
             clearMessage.classList.remove('hidden');
+
+            // --- 画面右上に「タイトルへ」「クイズへ」ボタンを追加 ---
+            let topControls = document.getElementById('game-top-controls');
+            if (!topControls) {
+                topControls = document.createElement('div');
+                topControls.id = 'game-top-controls';
+                // absolute で右上固定
+                topControls.style.position = 'absolute';
+                topControls.style.top = '15px';
+                topControls.style.right = '15px';
+                topControls.style.zIndex = '1000';
+                topControls.style.display = 'flex';
+                topControls.style.gap = '10px';
+
+                // タイトルへボタン
+                const toTitleBtn = document.createElement('button');
+                toTitleBtn.className = 'outline-btn';
+                toTitleBtn.style.padding = '8px 16px';
+                toTitleBtn.style.fontSize = '1rem';
+                toTitleBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                toTitleBtn.innerHTML = '<span class="hiragana">タイトルへ</span><span class="kanji">タイトルへ</span>';
+                toTitleBtn.addEventListener('click', () => location.reload());
+
+                // クイズへボタン
+                const topToQuizBtn = document.createElement('button');
+                topToQuizBtn.className = 'primary-btn';
+                topToQuizBtn.style.padding = '8px 16px';
+                topToQuizBtn.style.fontSize = '1rem';
+                topToQuizBtn.innerHTML = '<span class="hiragana">クイズへ ▸</span><span class="kanji">クイズへ ▸</span>';
+                topToQuizBtn.addEventListener('click', startQuiz);
+
+                topControls.appendChild(toTitleBtn);
+                topControls.appendChild(topToQuizBtn);
+                gameScreen.appendChild(topControls);
+            }
+            topControls.classList.remove('hidden');
+
             return;
         }
         const data = uploadedImages[currentCardIndex];
