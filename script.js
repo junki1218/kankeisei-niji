@@ -366,13 +366,28 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             document.head.appendChild(style);
 
-            const pTag = clearMessage.querySelector('p');
-            if (pTag) {
-                pTag.innerHTML = `
-                    <span class="hiragana">🌈 にじが できたね！<br><br>※このがめんを スクリーンショットしてね<br>↓つぎは クイズにちょうせん！</span>
-                    <span class="kanji">🌈 虹が できました！<br><br>※この画面をスクリーンショットしてね。<br>↓次はふれあいクイズに挑戦！</span>
-                `;
-            }
+            // innerHTMLをまるごと書き換えて、強力なキャッシュや古いHTML構造を完全に無視する
+            clearMessage.innerHTML = `
+                <button id="close-clear-message-btn" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2rem; font-weight: bold; cursor: pointer; color: #94a3b8; padding: 0;">×</button>
+                <h2 class="hiragana text-xl highlight" style="margin-top: 15px; margin-bottom: 20px;">🌈 にじが できたね！</h2>
+                <h2 class="kanji text-xl highlight" style="margin-top: 15px; margin-bottom: 20px;">🌈 虹が できました！</h2>
+                <p style="margin-bottom: 25px; color: var(--text-primary); font-weight: 500; font-size: 1.1rem; line-height: 1.6;">
+                    <span class="hiragana">※ このがめんを<br>スクリーンショットしてね！<br><br>↓ おわったら クイズに ちょうせん！</span>
+                    <span class="kanji">※ この画面を<br>スクリーンショットしてね！<br><br>↓ 終わったら、ふれあいクイズに挑戦！</span>
+                </p>
+                <div class="flex-center">
+                    <button id="dynamic-to-quiz-btn" class="primary-btn bounce-animation" style="width: 100%; border: none;">
+                        <span class="hiragana">ふれあいクイズへ ▸</span>
+                        <span class="kanji">ふれあいクイズへ ▸</span>
+                    </button>
+                </div>
+            `;
+
+            // 追加した要素のイベントリスナーを登録
+            document.getElementById('close-clear-message-btn').addEventListener('click', () => {
+                clearMessage.classList.add('hidden');
+            });
+            document.getElementById('dynamic-to-quiz-btn').addEventListener('click', startQuiz);
 
             clearMessage.classList.remove('hidden');
             return;
@@ -631,17 +646,18 @@ document.addEventListener('DOMContentLoaded', () => {
         draggedElement.removeEventListener('touchstart', dragStart);
         draggedElement.classList.add('fixed');
 
-        const rect = draggedElement.getBoundingClientRect();
         const containerRect = gameContainer.getBoundingClientRect();
 
-        // fixedクラスが付与されるとCSSで scale(0.9) 等が適用されるため、
-        // 視覚的な中心座標を維持するために、現在の中心座標を計算します。
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+        // -------------------------------------------------------------
+        // 要素をDOM上で「移動」したりクラスを付け替えた際の再計算ズレを防ぐため、
+        // 「今ドラッグで配置されていたピクセル位置」をそのまま100%の割合に変換します。
+        // （CSSの translate(-50%, -50%) によって、指定座標＝中心 となるためこれが一番正確です）
+        // -------------------------------------------------------------
+        const currentPxX = parseFloat(draggedElement.style.left);
+        const currentPxY = parseFloat(draggedElement.style.top);
 
-        // コンテナ内での中心座標の割合(%)を計算します。
-        const leftPerc = ((centerX - containerRect.left) / containerRect.width) * 100;
-        const topPerc = ((centerY - containerRect.top) / containerRect.height) * 100;
+        const leftPerc = (currentPxX / containerRect.width) * 100;
+        const topPerc = (currentPxY / containerRect.height) * 100;
 
         // left/top は要素の左上の位置を指定しますが、
         // .draggable-card-container にはCSSで transform: translate(-50%, -50%) が
