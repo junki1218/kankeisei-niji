@@ -268,24 +268,7 @@ button:disabled {
     color: var(--danger-color);
 }
 
-/* OP画面 */
-.op-panel {
-    padding: 80px 40px;
-}
 
-@media (max-width: 768px) {
-    .op-panel {
-        padding: 40px 20px;
-    }
-
-    .main-title {
-        font-size: 2rem;
-    }
-
-    .subtitle {
-        font-size: 1.2rem;
-    }
-}
 
 /* アニメーション */
 .pulse-animation {

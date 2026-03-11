@@ -37,19 +37,19 @@
 
         <!-- OP画面 (スタート画面) -->
         <section id="op-screen" class="screen active"
-            style="overflow: hidden; justify-content: flex-end; align-items: center; padding-bottom: 20px;">
-            <!-- 背景動画コンテナ -->
+            style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; background: #fff; height: 100vh;">
+
+            <!-- 背景動画コンテナ (上部に大きく表示) -->
             <div id="video-container"
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background: #000;">
+                style="width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #fff;">
                 <video id="op-video" src="./OP.mp4" autoplay loop muted playsinline
-                    style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;"></video>
+                    style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;"></video>
             </div>
 
-            <div class="glass-panel op-panel" style="position: relative; z-index: 10; margin-top: auto;">
-                <h1 class="main-title">Relationship Rainbow</h1>
-                <p class="subtitle hiragana text-xl">ひととの きょりかん を まなぼう</p>
-                <p class="subtitle kanji text-xl">人との距離感を学ぼう</p>
-                <button id="op-start-btn" class="primary-btn pulse-animation mt-8">
+            <!-- スタートボタンコンテナ (下部に固定) -->
+            <div
+                style="width: 100%; padding: 20px; background: #fff; display: flex; justify-content: center; align-items: center;">
+                <button id="op-start-btn" class="primary-btn pulse-animation">
                     <span class="hiragana">スタート ▸</span>
                     <span class="kanji">スタート ▸</span>
                 </button>

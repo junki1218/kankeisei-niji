@@ -327,10 +327,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         if (uploadedImages.length === 0) return;
 
-        // ヒントありかなしの判定
+        // ヒントありかなしの判定 (空白を%20にエンコードしてパス切れを防ぐ)
         const hintMode = document.querySelector('input[name="hint-mode"]:checked')?.value || 'with_hint';
         if (hintMode === 'with_hint') {
-            gameContainer.style.backgroundImage = 'url("./hint board.png")';
+            gameContainer.style.backgroundImage = 'url("./hint%20board.png")';
         } else {
             gameContainer.style.backgroundImage = 'url("./board.png")';
         }
@@ -397,13 +397,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!topControls) {
                 topControls = document.createElement('div');
                 topControls.id = 'game-top-controls';
-                // absolute で右上固定
                 topControls.style.position = 'absolute';
                 topControls.style.top = '15px';
-                topControls.style.right = '15px';
+                topControls.style.right = '5px'; // 右端ギリギリに寄せてはみ出しを防止
                 topControls.style.zIndex = '1000';
                 topControls.style.display = 'flex';
+                topControls.style.flexDirection = 'column'; // 縦並びに変更
+                topControls.style.alignItems = 'flex-end'; // 右揃え
                 topControls.style.gap = '10px';
+                topControls.style.maxWidth = '25vw'; // 白い領域（全体の約30%弱）に収まるように制限
 
                 // タイトルへボタン
                 const toTitleBtn = document.createElement('button');
