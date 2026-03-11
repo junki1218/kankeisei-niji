@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rainbow-app-v24';
+const CACHE_NAME = 'rainbow-app-v27';
 const urlsToCache = [
     './',
     './index.html',
