@@ -342,9 +342,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCardIndex = 0;
         playArea.innerHTML = ''; clearMessage.classList.add('hidden'); nextBtn.classList.add('hidden');
 
-        // トップコントロールがあれば隠す
-        const topControls = document.getElementById('game-top-controls');
-        if (topControls) topControls.classList.add('hidden');
+        // エンドコントロールがあれば隠す
+        const endControls = document.getElementById('game-end-controls');
+        if (endControls) endControls.classList.add('hidden');
 
         showCardIntro();
     }
@@ -392,43 +392,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearMessage.classList.remove('hidden');
 
-            // --- 画面右上に「タイトルへ」「クイズへ」ボタンを追加 ---
-            let topControls = document.getElementById('game-top-controls');
-            if (!topControls) {
-                topControls = document.createElement('div');
-                topControls.id = 'game-top-controls';
-                topControls.style.position = 'absolute';
-                topControls.style.top = '15px';
-                topControls.style.right = '5px'; // 右端ギリギリに寄せてはみ出しを防止
-                topControls.style.zIndex = '1000';
-                topControls.style.display = 'flex';
-                topControls.style.flexDirection = 'column'; // 縦並びに変更
-                topControls.style.alignItems = 'flex-end'; // 右揃え
-                topControls.style.gap = '10px';
-                topControls.style.maxWidth = '25vw'; // 白い領域（全体の約30%弱）に収まるように制限
+            // --- 画面下部に「タイトルへ」「クイズへ」ボタンを追加 ---
+            let endControls = document.getElementById('game-end-controls');
+            if (!endControls) {
+                endControls = document.createElement('div');
+                endControls.id = 'game-end-controls';
+                endControls.style.display = 'flex';
+                endControls.style.flexDirection = 'row'; // 左右に並べる
+                endControls.style.gap = '20px'; // 間隔
 
                 // タイトルへボタン
                 const toTitleBtn = document.createElement('button');
-                toTitleBtn.className = 'outline-btn';
-                toTitleBtn.style.padding = '8px 16px';
-                toTitleBtn.style.fontSize = '1rem';
+                toTitleBtn.className = 'outline-btn pulse-animation';
+                toTitleBtn.style.padding = '10px 20px';
+                toTitleBtn.style.fontSize = '1.2rem';
                 toTitleBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
                 toTitleBtn.innerHTML = '<span class="hiragana">タイトルへ</span><span class="kanji">タイトルへ</span>';
                 toTitleBtn.addEventListener('click', () => location.reload());
 
                 // クイズへボタン
-                const topToQuizBtn = document.createElement('button');
-                topToQuizBtn.className = 'primary-btn';
-                topToQuizBtn.style.padding = '8px 16px';
-                topToQuizBtn.style.fontSize = '1rem';
-                topToQuizBtn.innerHTML = '<span class="hiragana">クイズへ ▸</span><span class="kanji">クイズへ ▸</span>';
-                topToQuizBtn.addEventListener('click', startQuiz);
+                const endToQuizBtn = document.createElement('button');
+                endToQuizBtn.className = 'primary-btn pulse-animation';
+                endToQuizBtn.style.padding = '10px 20px';
+                endToQuizBtn.style.fontSize = '1.2rem';
+                endToQuizBtn.innerHTML = '<span class="hiragana">クイズへ ▸</span><span class="kanji">クイズへ ▸</span>';
+                endToQuizBtn.addEventListener('click', startQuiz);
 
-                topControls.appendChild(toTitleBtn);
-                topControls.appendChild(topToQuizBtn);
-                gameScreen.appendChild(topControls);
+                endControls.appendChild(toTitleBtn);
+                endControls.appendChild(endToQuizBtn);
+
+                // 「つぎへ」ボタンがあるのと同じコンテナに追加する
+                document.getElementById('game-controls').appendChild(endControls);
             }
-            topControls.classList.remove('hidden');
+            endControls.classList.remove('hidden');
 
             return;
         }
