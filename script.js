@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         uploadedImages.push({
             id: 'img_' + Date.now() + Math.random().toString(36).substr(2, 5),
-            dataUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 透明プレースホルダー
+            dataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="0" y="0" width="24" height="24" fill="%23f8fafc" stroke="none"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>', // カメラプレースホルダー
             targetColor: 'purple',
             name: ''
         });
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // もし空ならデフォルトの6枠を用意する
         if (uploadedImages.length === 0) {
             const defaultColors = ['purple', 'blue', 'green', 'yellow', 'orange', 'red'];
-            const transparentImg = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+            const transparentImg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="0" y="0" width="24" height="24" fill="%23f8fafc" stroke="none"/><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
             uploadedImages = defaultColors.map(color => ({
                 id: 'img_' + Date.now() + Math.random().toString(36).substr(2, 5),
                 dataUrl: transparentImg,
@@ -373,22 +373,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h2 class="hiragana text-xl highlight" style="margin-top: 15px; margin-bottom: 20px;">🌈 にじが できたね！</h2>
                 <h2 class="kanji text-xl highlight" style="margin-top: 15px; margin-bottom: 20px;">🌈 虹が できました！</h2>
                 <p style="margin-bottom: 25px; color: var(--text-primary); font-weight: 500; font-size: 1.1rem; line-height: 1.6;">
-                    <span class="hiragana">※ このがめんを<br>スクリーンショットしてね！<br><br>↓ おわったら クイズに ちょうせん！</span>
-                    <span class="kanji">※ この画面を<br>スクリーンショットしてね！<br><br>↓ 終わったら、ふれあいクイズに挑戦！</span>
+                    <span class="hiragana">※ このがめんを<br>スクリーンショットしてね！</span>
+                    <span class="kanji">※ この画面を<br>スクリーンショットしてね！</span>
                 </p>
-                <div class="flex-center">
-                    <button id="dynamic-to-quiz-btn" class="primary-btn bounce-animation" style="width: 100%; border: none;">
-                        <span class="hiragana">ふれあいクイズへ ▸</span>
-                        <span class="kanji">ふれあいクイズへ ▸</span>
-                    </button>
-                </div>
             `;
 
             // 追加した要素のイベントリスナーを登録
             document.getElementById('close-clear-message-btn').addEventListener('click', () => {
                 clearMessage.classList.add('hidden');
             });
-            document.getElementById('dynamic-to-quiz-btn').addEventListener('click', startQuiz);
 
             clearMessage.classList.remove('hidden');
 
